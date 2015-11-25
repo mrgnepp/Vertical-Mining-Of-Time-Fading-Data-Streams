@@ -184,10 +184,12 @@
     <ClCompile Include="bit_vector.cpp" />
     <ClCompile Include="fade_vector.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="viper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bit_vector.hpp" />
     <ClInclude Include="fade_vector.hpp" />
+    <ClInclude Include="viper.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

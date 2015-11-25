@@ -24,12 +24,18 @@
     <ClCompile Include="fade_vector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="viper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bit_vector.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fade_vector.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="viper.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

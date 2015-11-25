@@ -48,7 +48,7 @@ bit_vector vert::operator&( const bit_vector &rhs, const bit_vector &lhs ) {
 	bit_vector result;
 	std::size_t maxSize = std::max( rhs.size(), lhs.size() );
 	for( std::size_t i = 0; i < maxSize; ++i ) {
-		result.append( rhs.size() < i && rhs[i] && lhs.size() < i && lhs[i] );
+		result.append( i < rhs.size() && rhs[i] && i < lhs.size() && lhs[i] );
 	}
 
 	return result;
