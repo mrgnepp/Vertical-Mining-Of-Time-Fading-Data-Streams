@@ -1,0 +1,44 @@
+#include "fade_vector.hpp"
+
+#include <sstream>
+
+using namespace vert;
+
+fade_vector::fade_vector() {}
+
+fade_vector::fade_vector( std::vector< double > &fades ) : m_fades( fades ) {}
+
+std::size_t fade_vector::size() const {
+	return m_fades.size();
+}
+
+double fade_vector::operator[]( std::size_t index ) const {
+	return m_fades[index];
+}
+
+void fade_vector::append( double value, std::size_t times ) {
+	for( auto it = m_fades.begin(); it != m_fades.end(); ++it ) {
+		*it *= value;
+	}
+
+	for( std::size_t i = 0; i < times; ++i ) {
+		m_fades.push_back( 1 );
+	}
+}
+
+std::string fade_vector::pretty() const {
+	std::stringstream s;
+	s << '(';
+
+	for( auto it = m_fades.begin(); it != m_fades.end(); ++it ) {
+		s << *it;
+
+		if( it != m_fades.end() - 1 ) {
+			s << ", ";
+		}
+	}
+
+	s << ')';
+
+	return s.str();
+}
