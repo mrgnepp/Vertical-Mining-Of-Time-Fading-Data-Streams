@@ -1,6 +1,7 @@
 #include "bit_vector.hpp"
 
 #include <algorithm>
+#include <sstream>
 
 using namespace vert;
 
@@ -11,7 +12,7 @@ void bit_vector::append( bool bit ) {
 	m_bits.push_back( bit );
 }
 
-double bit_vector::sum( const std::vector< double > &fade ) const {
+double bit_vector::sum( const vert::fade_vector &fade ) const {
 	double result = 0.0;
 	std::size_t index = 0;
 
@@ -51,4 +52,29 @@ bit_vector vert::operator&( const bit_vector &rhs, const bit_vector &lhs ) {
 	}
 
 	return result;
+}
+
+double vert::operator*( const bit_vector &lhs, const fade_vector &rhs ) {
+	return lhs.sum( rhs );
+}
+
+double vert::operator*( const fade_vector &lhs, const bit_vector &rhs ) {
+	return rhs.sum( lhs );
+}
+
+std::string bit_vector::pretty() const {
+	std::stringstream s;
+	s << '[';
+
+	for( auto it = m_bits.begin(); it != m_bits.end(); ++it ) {
+		if( *it ) {
+			s << '1';
+		} else {
+			s << '0';
+		}
+	}
+
+	s << ']';
+
+	return s.str();
 }
