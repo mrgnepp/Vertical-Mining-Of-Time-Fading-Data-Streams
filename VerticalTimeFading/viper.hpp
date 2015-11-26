@@ -5,7 +5,7 @@
 
 #include "bit_vector.hpp"
 
-namespace vert {
+namespace vert { namespace viper {
 
 struct item_set {
 	std::string m_name;
@@ -19,6 +19,6 @@ struct item_set {
 
 item_set operator&( const item_set &lhs, const item_set &rhs );
 
-std::vector< item_set > viper( const std::vector< item_set > &items, const vert::fade_vector &fades, double minsup );
+std::vector< item_set > do_viper( const std::vector< item_set > &items, const vert::fade_vector &fades, double minsup );
 
-}
+} }

@@ -4,15 +4,15 @@
 #include <algorithm>
 #include <set>
 
-using namespace vert;
+using namespace vert::viper;
 
 item_set::item_set( std::string & name, vert::bit_vector & bits ) : m_name( name ), m_bits( bits ) {}
 
-double item_set::support( const fade_vector &fades ) const {
+double vert::viper::item_set::support( const fade_vector &fades ) const {
 	return m_bits * fades;
 }
 
-std::string item_set::pretty( const fade_vector &fades ) const {
+std::string vert::viper::item_set::pretty( const fade_vector &fades ) const {
 	std::stringstream s;
 	s << '{';
 
@@ -27,11 +27,11 @@ std::string item_set::pretty( const fade_vector &fades ) const {
 	return s.str();
 }
 
-bool item_set::operator<( const item_set &rhs ) const {
+bool vert::viper::item_set::operator<( const item_set &rhs ) const {
 	return m_name < rhs.m_name;
 }
 
-item_set vert::operator&( const item_set &lhs, const item_set &rhs ) {
+item_set vert::viper::operator&( const item_set &lhs, const item_set &rhs ) {
 	std::string unordered = lhs.m_name + rhs.m_name;
 	std::sort( unordered.begin(), unordered.end() );
 
@@ -49,7 +49,7 @@ item_set vert::operator&( const item_set &lhs, const item_set &rhs ) {
 	return item_set( newName.str(), lhs.m_bits & rhs.m_bits );
 }
 
-std::vector< item_set > vert::viper( const std::vector< item_set > &items, const vert::fade_vector &fades, double minsup ) {
+std::vector< item_set > vert::viper::do_viper( const std::vector< item_set > &items, const vert::fade_vector &fades, double minsup ) {
 	std::vector< item_set > results;
 	std::vector< item_set > currentItems;
 
