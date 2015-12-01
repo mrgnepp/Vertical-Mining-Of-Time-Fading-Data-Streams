@@ -1,0 +1,59 @@
+
+ccu<1> AprioriAll SequentialDB2.txt 2
+===== AprioriAll TDB=SequentialDB2.txt minsup=2 =====
+
+Maximal frequent sequence filter=ON (i.e., showing only MFSeqs)
+FS2: (3) (8)
+FS2: (3) (4 7)
+
+Total runtime is *** sec. ***.*** msec
+
+|L1| = 0
+|L2| = 2
+|L3| = 0
+|L4| = 0
+|L5| = 0
+|L6| = 0
+|L7| = 0
+|L8| = 0
+|L9| = 0
+|L10| = 0
+
+|MFSs| = 2
+
+numNodes = *** (in global tree), *** (in all trees)
+
+===== AprioriAll TDB=SequentialDB2.txt minsup=2: Completed =====
+
+ccu<2> AprioriAll SequentialDB2.txt 2
+===== AprioriAll TDB=SequentialDB2.txt minsup=2 =====
+
+Maximal frequent sequence filter=OFF (i.e., showing all FSeqs)
+FS1: (3) [4]
+FS1: (4) [2]
+FS1: (7) [3]
+FS1: (8) [3]
+FS1: (4 7) [2]
+FS2: (3) (4) [2]
+FS2: (3) (7) [2]
+FS2: (3) (8) [2]
+FS2: (3) (4 7) [2]
+
+Total runtime is *** sec. ***.*** msec
+
+|L1| = 5
+|L2| = 4
+|L3| = 0
+|L4| = 0
+|L5| = 0
+|L6| = 0
+|L7| = 0
+|L8| = 0
+|L9| = 0
+|L10| = 0
+
+|FSs| = 9
+
+numNodes = *** (in global tree), *** (in all trees)
+
+===== AprioriAll TDB=SequentialDB2.txt minsup=2: Completed =====
