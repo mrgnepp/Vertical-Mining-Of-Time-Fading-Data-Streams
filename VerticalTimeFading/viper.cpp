@@ -6,7 +6,8 @@
 
 using namespace vert::viper;
 
-item_set::item_set( std::string & name, vert::bit_vector & bits ) : m_name( name ), m_bits( bits ) {}
+item_set::item_set( std::vector< uint32_t > & name, vert::bit_vector & bits ) : m_name( name ), m_bits( bits ) {}
+item_set::item_set() {};
 
 double vert::viper::item_set::support( const fade_vector &fades ) const {
 	return m_bits * fades;
@@ -32,31 +33,32 @@ bool vert::viper::item_set::operator<( const item_set &rhs ) const {
 }
 
 item_set vert::viper::operator&( const item_set &lhs, const item_set &rhs ) {
-	std::string unordered = lhs.m_name + rhs.m_name;
+	std::vector< uint32_t > unordered = lhs.m_name;
+	unordered.insert( unordered.end(), rhs.m_name.begin(), rhs.m_name.end() );
 	std::sort( unordered.begin(), unordered.end() );
 
-	std::stringstream newName;
-	char last = '\0';
+	std::vector< uint32_t > newName;
+	uint32_t last = std::numeric_limits<uint32_t>::max();
 
 	for( auto it = unordered.begin(); it != unordered.end(); ++it ) {
 		if( *it != last ) {
-			newName << *it;
+			newName.push_back( *it );
 		}
 
 		last = *it;
 	}
 
-	return item_set( newName.str(), lhs.m_bits & rhs.m_bits );
+	return item_set( newName, lhs.m_bits & rhs.m_bits );
 }
 
-std::vector< item_set > vert::viper::do_viper( const std::vector< item_set > &items, const vert::fade_vector &fades, double minsup ) {
+std::vector< item_set > vert::viper::do_viper( const std::map< uint32_t, item_set > &items, const vert::fade_vector &fades, double minsup ) {
 	std::vector< item_set > results;
 	std::vector< item_set > currentItems;
 
 	for( auto it = items.begin(); it != items.end(); ++it ) {
-		if( it->m_bits * fades >= minsup ) {
-			currentItems.push_back( *it );
-			results.push_back( *it );
+		if( it->second.m_bits * fades >= minsup ) {
+			currentItems.push_back( it->second );
+			results.push_back( it->second );
 		}
 	}
 

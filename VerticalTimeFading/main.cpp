@@ -3,6 +3,9 @@
 
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <sstream>
+#include <map>
 
 #include "bit_vector.hpp"
 #include "fade_vector.hpp"
@@ -13,10 +16,88 @@ void print_state( const vert::bit_vector &bits, const vert::fade_vector &fades )
 
 int32_t main( int32_t argc, char *argv[] ) {
 	//These should be self explanatory
-	const double fadeFactor = 0.5;
-	const double minsup = 3.0;
+	const double fadeFactor = 1.0;
+	const double minsup = 16.0;
+	const std::size_t chunkSize = 1000;
 
-	std::cout << "Time fade factor: " << fadeFactor << std::endl;
+	std::ifstream dataFile;
+	dataFile.open( "1k5l.txt" );
+
+	std::string dataLengthString;
+	std::getline( dataFile, dataLengthString );
+	const std::size_t numLines = std::stoll( dataLengthString );
+
+	std::map< uint32_t, vert::viper::item_set > itemSets;
+	vert::fade_vector fades;
+
+	std::cout << "Time Fading Viper" << std::endl;
+	std::cout << "Time Fade Factor: " << fadeFactor << std::endl;
+	std::cout << "Minsup: " << minsup << std::endl;
+	std::cout << "Transaction Block Size: " << chunkSize << std::endl << std::endl;
+
+	for( std::size_t i = 1; i < numLines; i += chunkSize ) {
+		std::size_t numTaken = 0;
+		std::string dataString;
+
+		std::cout << "Adding new transactions..." << std::endl;
+
+		while( numTaken < chunkSize && std::getline( dataFile, dataString ) && dataString != std::string( "" ) ) {
+			std::size_t transaction = i + numTaken;
+			std::string buffer;
+			std::vector< uint32_t > transactionData;
+			std::stringstream ss( dataString );
+
+			//Get rid of the transaction number
+			ss >> buffer;
+			ss >> buffer;
+
+			while( ss >> buffer ) {
+				transactionData.push_back( std::stoi( buffer ) );
+			}
+
+			for( auto it = itemSets.begin(); it != itemSets.end(); ++it ) {
+				it->second.m_bits.append( false );
+			}
+
+			for( auto it = transactionData.begin(); it != transactionData.end(); ++it ) {
+				auto is = itemSets.find( *it );
+				if( is == itemSets.end() ) {
+					std::vector< bool > v;
+					for( std::size_t j = 0; j < transaction; ++j ) {
+						v.push_back( false );
+					}
+
+					v.push_back( true );
+					std::vector< uint32_t > name = { *it };
+
+					itemSets[*it] = vert::viper::item_set( name, vert::bit_vector( v ) );
+				} else {
+					is->second.m_bits.activate_last();
+				}
+			}
+
+			++numTaken;
+		}
+
+		fades.append( fadeFactor, numTaken );
+
+		std::cout << "Begin VIPER round..." << std::endl;
+
+		std::vector< vert::viper::item_set > result = vert::viper::do_viper( itemSets, fades, minsup );
+
+		std::cout << "Frequent itemsets after addign transactions " << i << " to " << i + chunkSize << ":" << std::endl;
+
+		for( auto it = result.begin(); it != result.end(); ++it ) {
+			std::cout << it->pretty( fades ) << std::endl;
+		}
+
+		std::cout << std::endl;
+		
+	}
+
+	dataFile.close();
+
+	/*std::cout << "Time fade factor: " << fadeFactor << std::endl;
 	std::cout << "Minimum support threshold: " << minsup << std::endl << std::endl;
 
 	//Data used to initialize the bit_vectors for each 1-itemset
@@ -73,7 +154,7 @@ int32_t main( int32_t argc, char *argv[] ) {
 	std::cout << "Frequent itemsets after time fade and additional transaction:" << std::endl;
 	for( auto it = frequentItemSets.begin(); it != frequentItemSets.end(); ++it ) {
 		std::cout << it->pretty( fades ) << std::endl;
-	}
+	}*/
 
 	std::cout << std::endl << "End of Processing" << std::endl << "Press Enter to Exit" << std::endl;
 	std::cin.get();
