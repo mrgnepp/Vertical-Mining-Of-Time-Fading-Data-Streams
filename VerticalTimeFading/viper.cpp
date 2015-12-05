@@ -2,7 +2,8 @@
 
 #include <sstream>
 #include <algorithm>
-#include <set>
+#include <unordered_map>
+#include <iostream>
 
 using namespace vert::viper;
 
@@ -13,12 +14,12 @@ double vert::viper::item_set::support( const fade_vector &fades ) const {
 	return m_bits * fades;
 }
 
-std::string vert::viper::item_set::pretty( const fade_vector &fades ) const {
+std::string vert::viper::item_set::pretty( const fade_vector &fades, const std::map< uint32_t, uint32_t > &dataMap ) const {
 	std::stringstream s;
 	s << '{';
 
 	for( auto it = m_name.begin(); it != m_name.end(); ++it ) {
-		s << *it;
+		s << dataMap.find( *it )->second;
 		if( it != m_name.end() - 1 ) {
 			s << ", ";
 		}
@@ -51,38 +52,141 @@ item_set vert::viper::operator&( const item_set &lhs, const item_set &rhs ) {
 	return item_set( newName, lhs.m_bits & rhs.m_bits );
 }
 
+vert::viper::prefix::prefix( item_set *items ) {
+	m_items = items->m_name;
+	m_items.pop_back();
+	std::stringstream ss;
+	bool started = false;
+	for( auto it = m_items.begin(); it != m_items.end(); ++it ) {
+		if( started ) {
+			ss << ' ';
+		} else {
+			started = true;
+		}
+
+		ss << *it;
+	}
+
+	extension ext;
+	ext.m_from = items;
+	ext.m_ext = items->m_name.back();
+
+	m_extensions.push_back( ext );
+
+	m_key = ss.str();
+}
+
+std::vector< prefix::result > vert::viper::prefix::generate_potential_candidates() const {
+	std::vector< prefix::result > result;
+
+	for( std::size_t i = 0; i < m_extensions.size(); ++i ) {
+		for( std::size_t j = i + 1; j < m_extensions.size(); ++j ) {
+			std::vector< uint32_t > temp = m_items;
+			temp.push_back( m_extensions[i].m_ext );
+			temp.push_back( m_extensions[j].m_ext );
+			result.push_back( prefix::result( m_extensions[i].m_from, m_extensions[j].m_from, temp ) );
+		}
+	}
+
+	return result;
+}
+
+bool vert::viper::prefix::operator<( const prefix &rhs ) const {
+	return m_key < rhs.m_key;
+}
+
+vert::viper::prefix::result::result( item_set *first, item_set *second, std::vector< uint32_t > &items ) : m_first( first ), m_second( second ), m_items( items ) {}
+
 std::vector< item_set > vert::viper::do_viper( const std::vector< item_set > &items, const vert::fade_vector &fades, double minsup ) {
 	std::vector< item_set > results;
 	std::vector< item_set > currentItems;
 
+	//First Pass
 	for( auto it = items.begin(); it != items.end(); ++it ) {
 		if( it->m_bits * fades >= minsup ) {
-			currentItems.push_back( *it );
 			results.push_back( *it );
 		}
 	}
 
-	std::size_t currentSetSize = 1;
+	std::vector< std::vector< double > > counts;
+	const std::size_t numItems = items.size();
 
+	//Build up the count array
+	for( std::size_t i = 0; i < numItems; ++i ) {
+		counts.push_back( std::vector< double >() );
+		for( std::size_t j = 0; j < numItems/* - i*/; ++j ) {
+			counts[i].push_back( 0.0 );
+		}
+	}
+
+	//Second Pass
+	const std::size_t numTransactions = items[0].m_bits.size();
+	for( std::size_t t = 0; t < numTransactions; ++t ) {
+		std::vector< uint32_t > transaction;
+		uint32_t dataIndex = 0;
+		for( auto it = items.begin(); it != items.end(); ++it ) {
+			if( it->m_bits[t] ) {
+				transaction.push_back( dataIndex );
+			}
+			++dataIndex;
+		}
+
+		for( std::size_t i = 0; i < transaction.size(); ++i ) {
+			for( std::size_t j = i + 1; j < transaction.size(); ++j ) {
+				//Note that we're adding fades[t] here instead of 1
+				//This is an important detail which must be discussed in the paper
+				counts[transaction[i]][transaction[j]] = counts[transaction[i]][transaction[j]] + fades[t];
+			}
+		}
+	}
+
+	//Build up the candidates for going into the 3rd pass
+	for( std::size_t i = 0; i < numItems; ++i ) {
+		for( std::size_t j = 0; j < numItems - i; ++j ) {
+			if( counts[i][j] >= minsup ) {
+				item_set temp = items[i] & items[j];
+				currentItems.push_back( temp );
+				results.push_back( temp );
+			}
+		}
+	}
+
+	//Subsequent passes
+	std::size_t currentLevel = 2;
 	while( currentItems.size() > 0 ) {
-		std::set< item_set > candidates;
+		//FORC (Candidate Generation)
+		//This is an STL hash table
+		std::unordered_map< std::string, prefix > prefixMap;
+		//We also need to keep a list of all of the prefixes, as you can't iterate through a hash table
+		std::vector< prefix * > prefixList;
 
-		//TODO: This needs to be optimized. Using a set here is inefficient, the actual VIPER paper seems to use some sort of dependency graph
-		for( std::size_t i = 0; i < currentItems.size(); ++i ) {
-			for( std::size_t j = i + 1; j < currentItems.size(); ++j ) {
-				item_set candidate = currentItems[i] & currentItems[j];
-				if( candidate.m_name.size() == currentSetSize + 1 && candidate.support( fades ) >= minsup ) {
-					candidates.insert( candidate );
+		//Build up the hash table and list of prefixes
+		for( auto it = currentItems.begin(); it != currentItems.end(); ++it ) {
+			prefix pref( &( *it ) );
+			auto res = prefixMap.find( pref.m_key );
+			if( res != prefixMap.end() ) {
+				res->second.m_extensions.push_back( pref.m_extensions[0] );
+			} else {
+				prefixMap[ pref.m_key ] = pref;
+				prefixList.push_back( &prefixMap[pref.m_key] );
+			}
+		}
+
+		std::vector< item_set > candidates;
+
+		for( auto it = prefixList.begin(); it != prefixList.end(); ++it ) {
+			std::vector< prefix::result > potentialCandidates = ( *it )->generate_potential_candidates();
+			for( auto resIt = potentialCandidates.begin(); resIt != potentialCandidates.end(); ++resIt ) {
+				item_set candidate = *resIt->m_first & *resIt->m_second;
+				//There will need to be some discussion of this in the paper
+				if( candidate.support( fades ) >= minsup ) {
+					results.push_back( candidate );
+					candidates.push_back( candidate );
 				}
 			}
 		}
 
-		++currentSetSize;
-		currentItems.clear();
-		for( auto it = candidates.begin(); it != candidates.end(); ++it ) {
-			results.push_back( *it );
-			currentItems.push_back( *it );
-		}
+		currentItems = candidates;
 	}
 
 	return results;
