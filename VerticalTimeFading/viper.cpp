@@ -51,14 +51,14 @@ item_set vert::viper::operator&( const item_set &lhs, const item_set &rhs ) {
 	return item_set( newName, lhs.m_bits & rhs.m_bits );
 }
 
-std::vector< item_set > vert::viper::do_viper( const std::map< uint32_t, item_set > &items, const vert::fade_vector &fades, double minsup ) {
+std::vector< item_set > vert::viper::do_viper( const std::vector< item_set > &items, const vert::fade_vector &fades, double minsup ) {
 	std::vector< item_set > results;
 	std::vector< item_set > currentItems;
 
 	for( auto it = items.begin(); it != items.end(); ++it ) {
-		if( it->second.m_bits * fades >= minsup ) {
-			currentItems.push_back( it->second );
-			results.push_back( it->second );
+		if( it->m_bits * fades >= minsup ) {
+			currentItems.push_back( *it );
+			results.push_back( *it );
 		}
 	}
 
@@ -67,6 +67,7 @@ std::vector< item_set > vert::viper::do_viper( const std::map< uint32_t, item_se
 	while( currentItems.size() > 0 ) {
 		std::set< item_set > candidates;
 
+		//TODO: This needs to be optimized. Using a set here is inefficient, the actual VIPER paper seems to use some sort of dependency graph
 		for( std::size_t i = 0; i < currentItems.size(); ++i ) {
 			for( std::size_t j = i + 1; j < currentItems.size(); ++j ) {
 				item_set candidate = currentItems[i] & currentItems[j];

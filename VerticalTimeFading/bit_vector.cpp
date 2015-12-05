@@ -12,10 +12,6 @@ void bit_vector::append( bool bit ) {
 	m_bits.push_back( bit );
 }
 
-void bit_vector::activate_last() {
-	m_bits[m_bits.size() - 1] = true;
-}
-
 double bit_vector::sum( const vert::fade_vector &fade ) const {
 	double result = 0.0;
 	std::size_t index = 0;

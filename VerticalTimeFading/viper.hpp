@@ -21,6 +21,6 @@ struct item_set {
 
 item_set operator&( const item_set &lhs, const item_set &rhs );
 
-std::vector< item_set > do_viper( const std::map< uint32_t, item_set > &items, const vert::fade_vector &fades, double minsup );
+std::vector< item_set > do_viper( const std::vector< item_set > &items, const vert::fade_vector &fades, double minsup );
 
 } }

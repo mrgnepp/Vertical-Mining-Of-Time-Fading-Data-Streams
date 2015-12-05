@@ -17,22 +17,22 @@ void print_state( const vert::bit_vector &bits, const vert::fade_vector &fades )
 int32_t main( int32_t argc, char *argv[] ) {
 	//These should be self explanatory
 	const double fadeFactor = 1.0;
-	const double minsup = 16.0;
-	const std::size_t chunkSize = 1000;
+	const double minsupPercent = 0.75;
+	const std::size_t chunkSize = 5;
 
 	std::ifstream dataFile;
 	dataFile.open( "1k5l.txt" );
 
 	std::string dataLengthString;
 	std::getline( dataFile, dataLengthString );
-	const std::size_t numLines = std::stoll( dataLengthString );
+	const std::size_t numLines = 5;// std::stoll( dataLengthString );
 
-	std::map< uint32_t, vert::viper::item_set > itemSets;
+	std::vector< vert::viper::item_set > itemSets;
 	vert::fade_vector fades;
 
-	std::cout << "Time Fading Viper" << std::endl;
+	std::cout << "Time Fading VIPER" << std::endl;
 	std::cout << "Time Fade Factor: " << fadeFactor << std::endl;
-	std::cout << "Minsup: " << minsup << std::endl;
+	std::cout << "Minsup: " << minsupPercent * 100.0 << "%" << std::endl;
 	std::cout << "Transaction Block Size: " << chunkSize << std::endl << std::endl;
 
 	for( std::size_t i = 1; i < numLines; i += chunkSize ) {
@@ -44,7 +44,7 @@ int32_t main( int32_t argc, char *argv[] ) {
 		while( numTaken < chunkSize && std::getline( dataFile, dataString ) && dataString != std::string( "" ) ) {
 			std::size_t transaction = i + numTaken;
 			std::string buffer;
-			std::vector< uint32_t > transactionData;
+			std::map< uint32_t, bool > transactionData;
 			std::stringstream ss( dataString );
 
 			//Get rid of the transaction number
@@ -52,27 +52,29 @@ int32_t main( int32_t argc, char *argv[] ) {
 			ss >> buffer;
 
 			while( ss >> buffer ) {
-				transactionData.push_back( std::stoi( buffer ) );
+				uint32_t item = std::stoi( buffer );
+				transactionData[item] = false;
 			}
 
 			for( auto it = itemSets.begin(); it != itemSets.end(); ++it ) {
-				it->second.m_bits.append( false );
+				auto bv = transactionData.find( it->m_name[0] );
+				it->m_bits.append( bv == transactionData.end() );
+				if( bv != transactionData.end() ) {
+					bv->second = true;
+				}
 			}
 
 			for( auto it = transactionData.begin(); it != transactionData.end(); ++it ) {
-				auto is = itemSets.find( *it );
-				if( is == itemSets.end() ) {
+				if( ! it->second ) {
 					std::vector< bool > v;
 					for( std::size_t j = 0; j < transaction; ++j ) {
 						v.push_back( false );
 					}
 
 					v.push_back( true );
-					std::vector< uint32_t > name = { *it };
+					std::vector< uint32_t > name = { it->first };
 
-					itemSets[*it] = vert::viper::item_set( name, vert::bit_vector( v ) );
-				} else {
-					is->second.m_bits.activate_last();
+					itemSets.push_back( vert::viper::item_set( name, vert::bit_vector( v ) ) );
 				}
 			}
 
@@ -81,8 +83,10 @@ int32_t main( int32_t argc, char *argv[] ) {
 
 		fades.append( fadeFactor, numTaken );
 
-		std::cout << "Begin VIPER round..." << std::endl;
+		
+		const double minsup = static_cast< double >( ( i + numTaken ) - 1 ) * minsupPercent;
 
+		std::cout << "Begin VIPER round, minsup = " << minsup << "..." << std::endl;
 		std::vector< vert::viper::item_set > result = vert::viper::do_viper( itemSets, fades, minsup );
 
 		std::cout << "Frequent itemsets after addign transactions " << i << " to " << i + chunkSize << ":" << std::endl;
