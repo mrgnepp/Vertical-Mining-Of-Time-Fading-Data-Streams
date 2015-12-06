@@ -16,12 +16,12 @@ void print_state( const vert::bit_vector &bits, const vert::fade_vector &fades )
 
 int32_t main( int32_t argc, char *argv[] ) {
 	//These should be self explanatory
-	const double fadeFactor = 0.5;
-	const double minsup = 5.0;
-	const std::size_t chunkSize = 1024;
+	const double fadeFactor = 1;
+	const double minsup = 3;
+	const std::size_t chunkSize = 6;
 
 	std::ifstream dataFile;
-	dataFile.open( "retail.txt" );
+	dataFile.open( "class.txt" );
 
 	std::string dataLengthString;
 	std::getline( dataFile, dataLengthString );
@@ -53,7 +53,7 @@ int32_t main( int32_t argc, char *argv[] ) {
 			//Get rid of the transaction number and count
 			ss >> buffer;
 			//Uncomment this if the sample data includes the number of items in a transaction before the transaction.
-			//ss >> buffer;
+			ss >> buffer;
 
 			while( ss >> buffer ) {
 				uint32_t item = std::stoi( buffer );
