@@ -184,9 +184,11 @@
     <ClCompile Include="bit_vector.cpp" />
     <ClCompile Include="fade_vector.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="apriori.cpp" />
     <ClCompile Include="viper.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="apriori.hpp" />
     <ClInclude Include="bit_vector.hpp" />
     <ClInclude Include="fade_vector.hpp" />
     <ClInclude Include="viper.hpp" />
