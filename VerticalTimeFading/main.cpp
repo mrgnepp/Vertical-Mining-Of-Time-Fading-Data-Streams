@@ -29,8 +29,8 @@ int32_t main( int32_t argc, char *argv[] ) {
 	}
 
 	const double fadeFactor = 0.5;
-	const double minsup = 3.0;
-	const std::size_t chunkSize = 3;
+	const double minsup = 5.0;
+	const std::size_t chunkSize = 128;
 
 	const std::string testFile = std::string( argv[1] );
 
