@@ -1,5 +1,7 @@
 #include "viper.hpp"
 
+//Author: Evan Spearman
+
 #include <sstream>
 #include <algorithm>
 #include <unordered_map>
@@ -114,7 +116,7 @@ std::vector< item_set > vert::viper::do_viper( const std::vector< item_set > &it
 	//Build up the count array
 	for( std::size_t i = 0; i < numItems; ++i ) {
 		counts.push_back( std::vector< double >() );
-		for( std::size_t j = 0; j < numItems/* - i*/; ++j ) {
+		for( std::size_t j = 0; j < numItems; ++j ) {
 			counts[i].push_back( 0.0 );
 		}
 	}

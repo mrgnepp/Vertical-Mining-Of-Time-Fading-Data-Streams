@@ -1,5 +1,7 @@
 #pragma once
 
+//Author: Evan Spearman
+
 #include <vector>
 #include <utility>
 #include <map>

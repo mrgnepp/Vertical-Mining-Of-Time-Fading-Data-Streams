@@ -110,7 +110,6 @@ void run_viper_test( const std::string &filename, double fadeFactor, double mins
 
 			while( ss >> buffer ) {
 				uint32_t item = std::stoi( buffer );
-				std::cout << item << std::endl;
 				auto found = reverseDataMap.find( item );
 				if( found == reverseDataMap.end() ) {
 					dataMap[nextIndex] = item;
