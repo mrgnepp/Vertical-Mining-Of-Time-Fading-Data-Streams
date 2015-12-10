@@ -215,7 +215,6 @@ apriori::transaction apriori::get_transaction( std::string transaction_str ) {
 
 	for ( int i = 0; i < trans.num_items; i++ ) {
 		ss >> buff;
-		std::cout << buff << std::endl;
 		trans_itemset.insert( std::stoi( buff ) );
 	}
 

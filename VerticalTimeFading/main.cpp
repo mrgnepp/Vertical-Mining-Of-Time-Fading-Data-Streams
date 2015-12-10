@@ -41,7 +41,7 @@ int32_t main( int32_t argc, char *argv[] ) {
 	std::chrono::duration< double > elapsedSeconds;
 
 	double t = static_cast< double >( std::stoll( argv[2] ) );
-	std::vector< double > minsups = { t * 0.25, t * 0.5, t * 0.75, t * 1.0, t * 1.5, t * 2.0 };
+	std::vector< double > minsups = { t * 0.005, t * 0.0075, t * 0.01 };
 
 	for( auto it = minsups.begin(); it != minsups.end(); ++it ) {
 		start = std::chrono::system_clock::now();
@@ -57,11 +57,13 @@ int32_t main( int32_t argc, char *argv[] ) {
 	elapsedSeconds = end - start;
 	std::cout << "Eclat Runtime: " << elapsedSeconds.count() << " seconds." << std::endl << std::endl;*/
 
-	/*start = std::chrono::system_clock::now();
-	run_apriori_test( testFile, fadeFactor, minsup, chunkSize );
-	end = std::chrono::system_clock::now();
-	elapsedSeconds = end - start;
-	std::cout << "Apriori Runtime: " << elapsedSeconds.count() << " seconds." << std::endl;*/
+	for( auto it = minsups.begin(); it != minsups.end(); ++it ) {
+		start = std::chrono::system_clock::now();
+		run_apriori_test( testFile, fadeFactor, *it, chunkSize );
+		end = std::chrono::system_clock::now();
+		elapsedSeconds = end - start;
+		std::cout << "Apriori Runtime: " << elapsedSeconds.count() << " seconds." << std::endl;
+	}
 
 	std::cout << std::endl << "End of Processing" << std::endl << "Press Enter to Exit" << std::endl;
 	std::cin.get();

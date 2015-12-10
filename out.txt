@@ -1,0 +1,174 @@
+Time Fading VIPER
+Time Fade Factor: 0.5
+Batch Size: 128
+
+Adding new transactions...
+Begin VIPER, minsup = 5...
+Frequent itemsets:
+{275}:8.07031
+{572}:12.6172
+{904}:7.35938
+{554}:9.34375
+{871}:9.30469
+{602}:6.64063
+{88}:7.19531
+{708}:5.92188
+{247}:7.52344
+{596}:5.04688
+{546}:6.52344
+{117}:5.44531
+{39}:6.63281
+{37}:5.42969
+{433}:8.78906
+{282}:7.34375
+{593}:7.63281
+{189}:5.57031
+{801}:5.16406
+{807}:8.42969
+{290}:6.75781
+{522}:5.67969
+{403}:5.92969
+{361}:6.54688
+{657}:6.25
+{12}:5.60156
+{249}:6.48438
+{909}:7.13281
+{223}:5.83594
+{319}:6.28125
+{401}:5.16406
+{809}:8.23438
+{993}:6.42188
+{989}:7.42969
+{375}:6.30469
+{828}:5.23438
+{406}:6.86719
+{133}:5.32031
+{148}:8.27344
+{939}:5.03906
+{630}:5
+{317}:8.1875
+
+VIPER Runtime: 0.0765969 seconds.
+
+Time Fading VIPER
+Time Fade Factor: 0.5
+Batch Size: 128
+
+Adding new transactions...
+Begin VIPER, minsup = 7.5...
+Frequent itemsets:
+{275}:8.07031
+{572}:12.6172
+{554}:9.34375
+{871}:9.30469
+{247}:7.52344
+{433}:8.78906
+{593}:7.63281
+{807}:8.42969
+{809}:8.23438
+{148}:8.27344
+{317}:8.1875
+
+VIPER Runtime: 0.0737328 seconds.
+
+Time Fading VIPER
+Time Fade Factor: 0.5
+Batch Size: 128
+
+Adding new transactions...
+Begin VIPER, minsup = 10...
+Frequent itemsets:
+{572}:12.6172
+
+VIPER Runtime: 0.0750917 seconds.
+
+Time Apriori
+Time Fade Factor: 0.5
+Minsup: 5
+Transaction Block Size: 128
+
+Adding new transactions...
+Begin Apriori...
+Frequent itemsets after adding transactions 1 to 1000
+Printing all frequent itemsets...
+{12}:5.60156
+{37}:5.42969
+{39}:6.63281
+{88}:7.19531
+{117}:5.44531
+{133}:5.32031
+{148}:8.27344
+{189}:5.57031
+{223}:5.83594
+{247}:7.52344
+{249}:6.48438
+{275}:8.07031
+{282}:7.34375
+{290}:6.75781
+{317}:8.1875
+{319}:6.28125
+{361}:6.54688
+{375}:6.30469
+{401}:5.16406
+{403}:5.92969
+{406}:6.86719
+{433}:8.78906
+{522}:5.67969
+{546}:6.52344
+{554}:9.34375
+{572}:12.6172
+{593}:7.63281
+{596}:5.04688
+{602}:6.64063
+{630}:5
+{657}:6.25
+{708}:5.92188
+{801}:5.16406
+{807}:8.42969
+{809}:8.23438
+{828}:5.23438
+{871}:9.30469
+{904}:7.35938
+{909}:7.13281
+{939}:5.03906
+{989}:7.42969
+{993}:6.42188
+
+Apriori Runtime: 0.660346 seconds.
+Time Apriori
+Time Fade Factor: 0.5
+Minsup: 7.5
+Transaction Block Size: 128
+
+Adding new transactions...
+Begin Apriori...
+Frequent itemsets after adding transactions 1 to 1000
+Printing all frequent itemsets...
+{148}:8.27344
+{247}:7.52344
+{275}:8.07031
+{317}:8.1875
+{433}:8.78906
+{554}:9.34375
+{572}:12.6172
+{593}:7.63281
+{807}:8.42969
+{809}:8.23438
+{871}:9.30469
+
+Apriori Runtime: 0.045903 seconds.
+Time Apriori
+Time Fade Factor: 0.5
+Minsup: 10
+Transaction Block Size: 128
+
+Adding new transactions...
+Begin Apriori...
+Frequent itemsets after adding transactions 1 to 1000
+Printing all frequent itemsets...
+{572}:12.6172
+
+Apriori Runtime: 0.0239606 seconds.
+
+End of Processing
+Press Enter to Exit

@@ -15,7 +15,7 @@ struct item_set {
 	vert::bit_vector m_bits;
 
 	item_set();
-	item_set( std::vector< uint32_t > &name, vert::bit_vector &bits );
+	item_set( std::vector< uint32_t > name, vert::bit_vector bits );
 	double support( const fade_vector &fades ) const;
 	std::string pretty( const fade_vector &fades, const std::map< uint32_t, uint32_t > &dataMap ) const;
 	bool operator<( const item_set &rhs ) const;
