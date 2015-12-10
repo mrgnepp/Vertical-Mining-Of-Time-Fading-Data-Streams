@@ -11,18 +11,21 @@
 #include "bit_vector.hpp"
 #include "fade_vector.hpp"
 #include "viper.hpp"
+#include "transact_set.hpp"
+#include "fade_set.hpp"
+#include "eclat.hpp"
 
 #include "apriori.hpp"
 
 //Print a bit_vector, a fade_vector, and that bit_vector summed against the fade vector
 void print_state( const vert::bit_vector &bits, const vert::fade_vector &fades );
+void print_state( const vert::transact_set &transacts, const vert::fade_set &fades );
 
 void run_viper_test( const std::string &filename, double fadeFactor, double minsup, std::size_t chunkSize );
 void run_eclat_test( const std::string &filename, double fadeFactor, double minsup, std::size_t chunkSize );
 void run_apriori_test( const std::string &filename, double fadeFactor, double minsup, std::size_t chunkSize );
 
 int32_t main( int32_t argc, char *argv[] ) {
-
 	if( argc < 2 ) {
 		std::cout << "Please specify a data file." << std::endl;
 		return EXIT_SUCCESS;
@@ -65,6 +68,10 @@ void print_state( const vert::bit_vector &bits, const vert::fade_vector &fades )
 	std::cout << "Bit Vector: " << bits.pretty() << ", Fade Vector: " << fades.pretty() << ", Support: " << bits * fades << std::endl;
 }
 
+void print_state( const vert::transact_set &transacts, const vert::fade_set &fades ) {
+	std::cout << "Bit Vector: " << transacts.pretty() << ", Fade Vector: " << fades.pretty() << ", Support: " << transacts * fades << std::endl;
+}
+
 void run_viper_test( const std::string &filename, double fadeFactor, double minsup, std::size_t chunkSize ) {
 	std::ifstream dataFile;
 	dataFile.open( filename );
@@ -103,6 +110,7 @@ void run_viper_test( const std::string &filename, double fadeFactor, double mins
 
 			while( ss >> buffer ) {
 				uint32_t item = std::stoi( buffer );
+				std::cout << item << std::endl;
 				auto found = reverseDataMap.find( item );
 				if( found == reverseDataMap.end() ) {
 					dataMap[nextIndex] = item;
@@ -146,7 +154,7 @@ void run_viper_test( const std::string &filename, double fadeFactor, double mins
 		std::cout << "Begin VIPER round..." << std::endl;
 		std::vector< vert::viper::item_set > result = vert::viper::do_viper( itemSets, fades, minsup );
 
-		std::cout << "Frequent itemsets after addign transactions " << i << " to " << i + chunkSize - 1 << ":" << std::endl;
+		std::cout << "Frequent itemsets after adding transactions " << i << " to " << i + chunkSize - 1 << ":" << std::endl;
 
 		for( auto it = result.begin(); it != result.end(); ++it ) {
 			std::cout << it->pretty( fades, dataMap ) << std::endl;

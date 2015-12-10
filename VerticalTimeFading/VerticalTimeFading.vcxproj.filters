@@ -27,6 +27,15 @@
     <ClCompile Include="viper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="eclat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fade_set.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="transact_set.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="apriori.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -39,6 +48,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="viper.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="eclat.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fade_set.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="transact_set.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="apriori.hpp">

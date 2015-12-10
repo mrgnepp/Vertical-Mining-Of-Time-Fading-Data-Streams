@@ -182,15 +182,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="bit_vector.cpp" />
+    <ClCompile Include="eclat.cpp" />
+    <ClCompile Include="fade_set.cpp" />
     <ClCompile Include="fade_vector.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="transact_set.cpp" />
     <ClCompile Include="apriori.cpp" />
     <ClCompile Include="viper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="apriori.hpp" />
     <ClInclude Include="bit_vector.hpp" />
+    <ClInclude Include="eclat.hpp" />
+    <ClInclude Include="fade_set.hpp" />
     <ClInclude Include="fade_vector.hpp" />
+    <ClInclude Include="transact_set.hpp" />
     <ClInclude Include="viper.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
