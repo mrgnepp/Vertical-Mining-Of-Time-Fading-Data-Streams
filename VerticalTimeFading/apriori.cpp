@@ -58,9 +58,6 @@ void apriori::do_apriori( std::string filename, double minsup, double fade_facto
 
 	std::cout << "Frequent itemsets found: " << total_freq_itemsets.size() << std::endl;
 	apriori::print_frequent_itemsets( total_freq_itemsets );
-
-	std::cout << "End of processing" << std::endl << "Press Enter to Exit" << std::endl;
-	std::cin.get();
 }
 
 std::map< std::set< int >, double > apriori::clean_frequent_itemsets( std::map< std::set< int >, double > candidates, double minsup ) {

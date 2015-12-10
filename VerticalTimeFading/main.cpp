@@ -6,22 +6,68 @@
 #include <fstream>
 #include <sstream>
 #include <map>
+#include <chrono>
 
 #include "bit_vector.hpp"
 #include "fade_vector.hpp"
 #include "viper.hpp"
 
+#include "apriori.hpp"
+
 //Print a bit_vector, a fade_vector, and that bit_vector summed against the fade vector
 void print_state( const vert::bit_vector &bits, const vert::fade_vector &fades );
 
-int32_t main( int32_t argc, char *argv[] ) {
-	//These should be self explanatory
-	const double fadeFactor = 1;
-	const double minsup = 3;
-	const std::size_t chunkSize = 6;
+void run_viper_test( const std::string &filename, double fadeFactor, double minsup, std::size_t chunkSize );
+void run_eclat_test( const std::string &filename, double fadeFactor, double minsup, std::size_t chunkSize );
+void run_apriori_test( const std::string &filename, double fadeFactor, double minsup, std::size_t chunkSize );
 
+int32_t main( int32_t argc, char *argv[] ) {
+
+	if( argc < 2 ) {
+		std::cout << "Please specify a data file." << std::endl;
+		return EXIT_SUCCESS;
+	}
+
+	const double fadeFactor = 0.5;
+	const double minsup = 3.0;
+	const std::size_t chunkSize = 3;
+
+	const std::string testFile = std::string( argv[1] );
+
+	std::chrono::time_point< std::chrono::system_clock > start;
+	std::chrono::time_point< std::chrono::system_clock > end;
+	std::chrono::duration< double > elapsedSeconds;
+
+	start = std::chrono::system_clock::now();
+	run_viper_test( testFile, fadeFactor, minsup, chunkSize );
+	end = std::chrono::system_clock::now();
+	elapsedSeconds = end - start;
+	std::cout << "VIPER Runtime: " << elapsedSeconds.count() << " seconds." << std::endl;
+
+	start = std::chrono::system_clock::now();
+	run_eclat_test( testFile, fadeFactor, minsup, chunkSize );
+	end = std::chrono::system_clock::now();
+	elapsedSeconds = end - start;
+	std::cout << "Eclat Runtime: " << elapsedSeconds.count() << " seconds." << std::endl;
+
+	start = std::chrono::system_clock::now();
+	run_apriori_test( testFile, fadeFactor, minsup, chunkSize );
+	end = std::chrono::system_clock::now();
+	elapsedSeconds = end - start;
+	std::cout << "Apriori Runtime: " << elapsedSeconds.count() << " seconds." << std::endl;
+
+	std::cout << std::endl << "End of Processing" << std::endl << "Press Enter to Exit" << std::endl;
+	std::cin.get();
+	return EXIT_SUCCESS;
+}
+
+void print_state( const vert::bit_vector &bits, const vert::fade_vector &fades ) {
+	std::cout << "Bit Vector: " << bits.pretty() << ", Fade Vector: " << fades.pretty() << ", Support: " << bits * fades << std::endl;
+}
+
+void run_viper_test( const std::string &filename, double fadeFactor, double minsup, std::size_t chunkSize ) {
 	std::ifstream dataFile;
-	dataFile.open( "class.txt" );
+	dataFile.open( filename );
 
 	std::string dataLengthString;
 	std::getline( dataFile, dataLengthString );
@@ -67,7 +113,7 @@ int32_t main( int32_t argc, char *argv[] ) {
 					transactionData[found->second] = false;
 				}
 
-				
+
 			}
 
 			for( auto it = itemSets.begin(); it != itemSets.end(); ++it ) {
@@ -79,7 +125,7 @@ int32_t main( int32_t argc, char *argv[] ) {
 			}
 
 			for( auto it = transactionData.begin(); it != transactionData.end(); ++it ) {
-				if( ! it->second ) {
+				if( !it->second ) {
 					std::vector< bool > v;
 					for( std::size_t j = 0; j < transaction - 1; ++j ) {
 						v.push_back( false );
@@ -107,16 +153,16 @@ int32_t main( int32_t argc, char *argv[] ) {
 		}
 
 		std::cout << std::endl;
-		
+
 	}
 
 	dataFile.close();
-
-	std::cout << std::endl << "End of Processing" << std::endl << "Press Enter to Exit" << std::endl;
-	std::cin.get();
-	return EXIT_SUCCESS;
 }
 
-void print_state( const vert::bit_vector &bits, const vert::fade_vector &fades ) {
-	std::cout << "Bit Vector: " << bits.pretty() << ", Fade Vector: " << fades.pretty() << ", Support: " << bits * fades << std::endl;
+void run_eclat_test( const std::string &filename, double fadeFactor, double minsup, std::size_t chunkSize ) {
+
+}
+
+void run_apriori_test( const std::string &filename, double fadeFactor, double minsup, std::size_t chunkSize ) {
+	apriori::do_apriori( filename, minsup, fadeFactor, static_cast< int >( chunkSize ) );
 }
