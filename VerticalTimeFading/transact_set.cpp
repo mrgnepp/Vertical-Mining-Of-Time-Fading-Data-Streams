@@ -48,14 +48,13 @@ transact_set vert::operator&( const transact_set &rhs, const transact_set &lhs )
 	transact_set result;
 
 	// This is the union operator. so if an int is in both, append
-	
-	//std::size_t maxSize = std::max( rhs.size(), lhs.size() );
-	//for( std::size_t i = 0; i < maxSize; ++i ) {
-		//result.append( i < rhs.size() && rhs[i] && i < lhs.size() && lhs[i] );
-	//	if( ) {
-
-	//	}
-	//}
+	for( std::size_t i = 0; i < rhs.size(); ++i ) {
+		for( std::size_t j = 0; j < lhs.size(); ++j ) {
+			if( rhs[j] == lhs[i] ) {
+				result.append( rhs[i] );
+			}
+		}
+	}
 
 	return result;
 }
@@ -73,11 +72,7 @@ std::string transact_set::pretty() const {
 	s << '[';
 
 	for( auto it = m_transacts.begin(); it != m_transacts.end(); ++it ) {
-		if( *it ) {
-			s << '1';
-		} else {
-			s << '0';
-		}
+		s << *it;
 	}
 
 	s << ']';
