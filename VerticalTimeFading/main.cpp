@@ -240,7 +240,7 @@ void run_eclat_test( const std::string &filename, double fadeFactor, double mins
 		fades.append( fadeFactor, numTaken );
 
 		std::cout << "Begin Eclat round..." << std::endl;
-		std::vector< vert::eclat::item_set > result = vert::eclat::do_eclat( itemSets, fades, minsup );
+		std::vector< vert::eclat::item_set > result = vert::eclat::do_eclat( itemSets, fades, minsup, numTaken + i );
 
 		std::cout << "Frequent itemsets after adding transactions " << i << " to " << i + chunkSize - 1 << ":" << std::endl;
 

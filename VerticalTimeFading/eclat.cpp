@@ -97,7 +97,7 @@ bool vert::eclat::prefix::operator<( const prefix &rhs ) const {
 
 vert::eclat::prefix::result::result( item_set *first, item_set *second, std::vector< uint32_t > &items ) : m_first( first ), m_second( second ), m_items( items ) {}
 
-std::vector< item_set > vert::eclat::do_eclat( const std::vector< item_set > &items, const vert::fade_set &fades, double minsup ) {
+std::vector< item_set > vert::eclat::do_eclat( const std::vector< item_set > &items, const vert::fade_set &fades, double minsup, std::size_t numTransactions ) {
 	std::vector< item_set > results;
 	std::vector< item_set > currentItems;
 
@@ -119,13 +119,12 @@ std::vector< item_set > vert::eclat::do_eclat( const std::vector< item_set > &it
 		}
 	}
 
-	//Second Pass
-	const std::size_t numTransactions = items[0].m_transacts.size();
+	// Second Pass
 	for( std::size_t t = 0; t < numTransactions; ++t ) {
 		std::vector< uint32_t > transaction;
 		uint32_t dataIndex = 0;
-		for( auto it = items.begin(); it != items.end(); ++it ) {
-			if( it->m_transacts[t] ) {
+		for ( auto it = items.begin(); it != items.end(); ++it ) {
+			if( it->m_transacts.find( t ) ) {
 				transaction.push_back( dataIndex );
 			}
 			++dataIndex;
@@ -138,6 +137,7 @@ std::vector< item_set > vert::eclat::do_eclat( const std::vector< item_set > &it
 		}
 	}
 
+	/* ECLAT GOES OUT OF BOUNDS 
 	//Build up the candidates for going into the 3rd pass
 	for( std::size_t i = 0; i < numItems; ++i ) {
 		for( std::size_t j = 0; j < numItems - i; ++j ) {
@@ -147,8 +147,8 @@ std::vector< item_set > vert::eclat::do_eclat( const std::vector< item_set > &it
 				results.push_back( temp );
 			}
 		}
-	}
-
+	} */
+	
 	//Subsequent passes
 	std::size_t currentLevel = 2;
 	while( currentItems.size() > 0 ) {

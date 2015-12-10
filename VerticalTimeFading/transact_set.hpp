@@ -15,10 +15,11 @@ private:
 public:
 	transact_set();
 	transact_set( const std::vector < int > &transacts );
-	void append( int set );
+	void append( int32_t set );
 	double sum( const vert::fade_set &fade ) const;
 	double sum() const;
 	std::size_t size() const;
+	bool find( int32_t value ) const;
 	int operator[]( std::size_t index ) const;
 	std::string pretty() const;
 
