@@ -9,72 +9,49 @@
 
 using namespace apriori;
 
-void apriori::do_apriori( std::string filename, double minsup, double fade_factor, int batch_size ) {
-	std::map< std::set< int >, double, cmp_by_cardinality > all_itemset_counts;
-
+void apriori::do_apriori(std::string filename, double minsup, double fade_factor, int batch_size) {
+	std::map< std::set< int >, double, cmp_by_cardinality > total_freq_itemsets;
 	std::cout << "Adding new transactions..." << std::endl;
 
 	//Load transactions
-	auto transactions = apriori::load_transactions( filename );
-	std::vector< std::vector< transaction > > batches = apriori::split_into_batches( transactions, batch_size );
-	
-	int batch_no = 0;
-	for ( auto batch : batches ) {
-		//Fade the current list of frequent itemsets
-		all_itemset_counts = apriori::fade_itemsets(all_itemset_counts, fade_factor);
+	auto transactions = apriori::load_transactions(filename);
+	std::vector< std::vector< transaction > > batches = apriori::split_into_batches(transactions, batch_size);
 
-		std::cout << "Begin Apriori round..." << std::endl;
-		
-		int pass_level = 1;
-		auto item_counts = apriori::count_singletons( batch );
-		auto freq_singletons = apriori::get_frequent_itemsets( all_itemset_counts, item_counts, 0 );
+	std::cout << "Begin Apriori..." << std::endl;
 
-		for ( auto it : freq_singletons ) {
-			all_itemset_counts[it.first] += it.second;
+	int pass_level = 1;
+	auto item_counts = apriori::count_singletons(batches, fade_factor);
+	auto freq_singletons = apriori::get_frequent_itemsets(total_freq_itemsets, item_counts, minsup);
+
+	for (auto it : freq_singletons) {
+		total_freq_itemsets[it.first] += it.second;
+	}
+
+	pass_level++;
+
+	auto candidate_itemsets = apriori::generate_candidate_itemsets(freq_singletons, pass_level);
+
+	while (!candidate_itemsets.empty()) {
+		candidate_itemsets = apriori::count_itemsets(batches, candidate_itemsets, fade_factor);
+		auto level_freq_itemsets = apriori::get_frequent_itemsets(total_freq_itemsets, candidate_itemsets, minsup);
+
+		for (auto it : level_freq_itemsets) {
+			total_freq_itemsets[it.first] += it.second;
 		}
 
 		pass_level++;
 
-		auto candidate_itemsets = apriori::generate_candidate_itemsets( freq_singletons, pass_level );
-		
-		while ( !candidate_itemsets.empty() ) {
-			candidate_itemsets = apriori::count_itemsets( batch, candidate_itemsets );
-			auto level_freq_itemsets = apriori::get_frequent_itemsets( all_itemset_counts, candidate_itemsets, 0 );
-
-			for ( auto it : level_freq_itemsets ) {
-				all_itemset_counts[it.first] += it.second;
-			}
-
-			pass_level++;
-
-			candidate_itemsets = apriori::generate_candidate_itemsets ( level_freq_itemsets, pass_level );
-			candidate_itemsets = apriori::prune_candidates( level_freq_itemsets, candidate_itemsets );
-		}
-		
-		auto batch_freq_itemsets = apriori::clean_frequent_itemsets(all_itemset_counts, minsup);
-		
-		std::cout << "Frequent itemsets after adding transactions " << ( batch_no * batch_size ) + 1 << " to " << ( batch_no * batch_size ) + batch.size() << std::endl;
-		apriori::print_frequent_itemsets(batch_freq_itemsets);
-		std::cout << std::endl;
-
-		batch_no++;
+		candidate_itemsets = apriori::generate_candidate_itemsets(level_freq_itemsets, pass_level);
+		candidate_itemsets = apriori::prune_candidates(level_freq_itemsets, candidate_itemsets);
 	}
 
+	std::cout << "Frequent itemsets after adding transactions 1 to " << transactions.size() << std::endl;
+	apriori::print_frequent_itemsets(total_freq_itemsets);
+	std::cout << std::endl;
 }
 
-std::map< std::set< int >, double, cmp_by_cardinality > apriori::clean_frequent_itemsets( std::map< std::set< int >, double, cmp_by_cardinality > candidates, double minsup ) {
-	std::map< std::set< int >, double, cmp_by_cardinality > freq_itemsets;
-
-	for ( auto it : candidates ) {
-		if ( it.second >= minsup ) {
-			freq_itemsets[it.first] = it.second;
-		}
-	}
-
-	return freq_itemsets;
-}
-
-std::map< std::set< int >, double, cmp_by_cardinality > apriori::get_frequent_itemsets( std::map< std::set< int >, double, cmp_by_cardinality > current_frequents, std::map< std::set< int >, double, cmp_by_cardinality > candidates, double minsup ) {
+std::map< std::set< int >, double, cmp_by_cardinality > apriori::get_frequent_itemsets( std::map< std::set< int >, double, 
+	cmp_by_cardinality > current_frequents, std::map< std::set< int >, double, cmp_by_cardinality > candidates, double minsup ) {
 	std::map< std::set< int >, double, cmp_by_cardinality > result;
 
 	for ( auto it : candidates ) {
@@ -86,29 +63,26 @@ std::map< std::set< int >, double, cmp_by_cardinality > apriori::get_frequent_it
 	return result;
 }
 
-std::map <std::set< int >, double, cmp_by_cardinality > apriori::fade_itemsets( std::map< std::set< int >, double, cmp_by_cardinality > freq_itemsets, double fade_factor ) {
-	auto result = freq_itemsets;
-
-	for ( auto itemset : result ) {
-		result[itemset.first] = itemset.second * fade_factor;
-	}
-	return result;
-}
-
-std::map< std::set< int >, double, cmp_by_cardinality > apriori::count_singletons( std::vector< transaction > transactions ) {
+std::map< std::set< int >, double, cmp_by_cardinality > apriori::count_singletons( std::vector< std::vector< transaction > > batches, double fade_factor ) {
 	std::map< std::set< int >, double, cmp_by_cardinality > item_counts;
 
-	for ( auto trans : transactions ) {
-		for ( auto jt : trans.itemset ) {
-			std::set< int > singleton;
-			singleton.insert( jt );
-			item_counts[singleton]++;
+	for (int i = 0; i < batches.size(); i++) {
+		auto transactions = batches[i];
+		auto applied_fade_factor = std::pow(fade_factor, batches.size() - (i + 1));
+
+		for (auto trans : transactions) {
+			for (auto jt : trans.itemset) {
+				std::set< int > singleton;
+				singleton.insert(jt);
+				item_counts[singleton] += applied_fade_factor;
+			}
 		}
 	}
 	return item_counts;
 }
 
-std::map< std::set< int >, double, cmp_by_cardinality > apriori::prune_candidates( std::map< std::set< int >, double, cmp_by_cardinality > freq_subsets, std::map< std::set< int >, double, cmp_by_cardinality > candidates ) {
+std::map< std::set< int >, double, cmp_by_cardinality > apriori::prune_candidates( std::map< std::set< int >, double, cmp_by_cardinality > freq_subsets, 
+	std::map< std::set< int >, double, cmp_by_cardinality > candidates ) {
 	auto result = candidates;
 	
 	for ( auto it: candidates ) {
@@ -129,20 +103,28 @@ std::map< std::set< int >, double, cmp_by_cardinality > apriori::prune_candidate
 	return result;
 }
 
-std::map< std::set< int >, double, cmp_by_cardinality > apriori::count_itemsets( std::vector< apriori::transaction > transactions, std::map< std::set< int >, double, cmp_by_cardinality > candidate_itemsets ) {
-	for ( auto it: transactions ) {
-		auto t_itemset = it.itemset;
-		
-		for ( auto jt: candidate_itemsets ) {
-			auto candidate_set = jt.first;
-			std::set<int> intersection;
-			std::set_intersection( t_itemset.begin(), t_itemset.end(), candidate_set.begin(), candidate_set.end(), std::inserter( intersection, intersection.begin() ) );
+std::map< std::set< int >, double, cmp_by_cardinality > apriori::count_itemsets( std::vector< std::vector< apriori::transaction > > batches, 
+	std::map< std::set< int >, double, cmp_by_cardinality > candidate_itemsets, double fade_factor ) {
+	for (int i = 0; i < batches.size(); i++) {
+		auto transactions = batches[i];
+		auto applied_fade_factor = std::pow(fade_factor, batches.size() - (i + 1));
+	
+		for (auto it : transactions) {
+			auto t_itemset = it.itemset;
 
-			if ( intersection == candidate_set ) {
-				candidate_itemsets[candidate_set]++;
+			for (auto jt : candidate_itemsets) {
+				auto candidate_set = jt.first;
+				std::set<int> intersection;
+				std::set_intersection(t_itemset.begin(), t_itemset.end(), candidate_set.begin(), candidate_set.end(), std::inserter(intersection, intersection.begin()));
+
+				if (intersection == candidate_set) {
+					candidate_itemsets[candidate_set] += applied_fade_factor;
+				}
 			}
 		}
 	}
+	
+
 
 	return candidate_itemsets;
 }
