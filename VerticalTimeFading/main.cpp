@@ -26,14 +26,13 @@ void run_eclat_test( const std::string &filename, double fadeFactor, double mins
 void run_apriori_test( const std::string &filename, double fadeFactor, double minsup, std::size_t chunkSize );
 
 int32_t main( int32_t argc, char *argv[] ) {
-	if( argc < 2 ) {
+	if( argc < 3 ) {
 		std::cout << "Please specify a data file." << std::endl;
 		return EXIT_SUCCESS;
 	}
 
 	const double fadeFactor = 0.5;
-	const double minsup = 2.0;
-	const std::size_t chunkSize = 2;
+	const std::size_t chunkSize = 128;
 
 	const std::string testFile = std::string( argv[1] );
 
@@ -41,11 +40,16 @@ int32_t main( int32_t argc, char *argv[] ) {
 	std::chrono::time_point< std::chrono::system_clock > end;
 	std::chrono::duration< double > elapsedSeconds;
 
-	start = std::chrono::system_clock::now();
-	run_viper_test( testFile, fadeFactor, minsup, chunkSize );
-	end = std::chrono::system_clock::now();
-	elapsedSeconds = end - start;
-	std::cout << "VIPER Runtime: " << elapsedSeconds.count() << " seconds." << std::endl << std::endl;
+	double t = static_cast< double >( std::stoll( argv[2] ) ) / 10;
+	std::vector< double > minsups = { t * 0.25, t * 0.5, t * 0.75, t * 1.0, t * 1.5, t * 2.0 };
+
+	for( auto it = minsups.begin(); it != minsups.end(); ++it ) {
+		start = std::chrono::system_clock::now();
+		run_viper_test( testFile, fadeFactor, *it, chunkSize );
+		end = std::chrono::system_clock::now();
+		elapsedSeconds = end - start;
+		std::cout << "VIPER Runtime: " << elapsedSeconds.count() << " seconds." << std::endl << std::endl;
+	}
 
 	/*start = std::chrono::system_clock::now();
 	run_eclat_test( testFile, fadeFactor, minsup, chunkSize );
@@ -53,11 +57,11 @@ int32_t main( int32_t argc, char *argv[] ) {
 	elapsedSeconds = end - start;
 	std::cout << "Eclat Runtime: " << elapsedSeconds.count() << " seconds." << std::endl << std::endl;*/
 
-	start = std::chrono::system_clock::now();
+	/*start = std::chrono::system_clock::now();
 	run_apriori_test( testFile, fadeFactor, minsup, chunkSize );
 	end = std::chrono::system_clock::now();
 	elapsedSeconds = end - start;
-	std::cout << "Apriori Runtime: " << elapsedSeconds.count() << " seconds." << std::endl;
+	std::cout << "Apriori Runtime: " << elapsedSeconds.count() << " seconds." << std::endl;*/
 
 	std::cout << std::endl << "End of Processing" << std::endl << "Press Enter to Exit" << std::endl;
 	std::cin.get();
@@ -153,7 +157,8 @@ void run_viper_test( const std::string &filename, double fadeFactor, double mins
 
 	dataFile.close();
 
-	std::cout << "Begin VIPER..." << std::endl;
+	
+	std::cout << "Begin VIPER, minsup = " << minsup << "..." << std::endl;
 	std::vector< vert::viper::item_set > result = vert::viper::do_viper( itemSets, fades, minsup );
 
 	std::cout << "Frequent itemsets:" << std::endl;
@@ -161,8 +166,10 @@ void run_viper_test( const std::string &filename, double fadeFactor, double mins
 	for( auto it = result.begin(); it != result.end(); ++it ) {
 		std::cout << it->pretty( fades, dataMap ) << std::endl;
 	}
-
 	std::cout << std::endl;
+	
+
+	
 }
 
 void run_eclat_test( const std::string &filename, double fadeFactor, double minsup, std::size_t chunkSize ) {
