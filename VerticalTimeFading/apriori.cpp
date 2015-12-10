@@ -10,7 +10,7 @@
 using namespace apriori;
 
 void apriori::do_apriori( std::string filename, double minsup, double fade_factor, int batch_size ) {
-	std::map< std::set< int >, double, cmp_by_cardinality > total_freq_itemsets;
+	std::map< std::set< int >, double, cmp_by_cardinality > all_itemset_counts;
 
 	std::cout << "Adding new transactions..." << std::endl;
 
@@ -21,16 +21,16 @@ void apriori::do_apriori( std::string filename, double minsup, double fade_facto
 	int batch_no = 0;
 	for ( auto batch : batches ) {
 		//Fade the current list of frequent itemsets
-		total_freq_itemsets = apriori::fade_itemsets(total_freq_itemsets, fade_factor);
+		all_itemset_counts = apriori::fade_itemsets(all_itemset_counts, fade_factor);
 
 		std::cout << "Begin Apriori round..." << std::endl;
 		
 		int pass_level = 1;
 		auto item_counts = apriori::count_singletons( batch );
-		auto freq_singletons = apriori::get_frequent_itemsets( total_freq_itemsets, item_counts, minsup );
+		auto freq_singletons = apriori::get_frequent_itemsets( all_itemset_counts, item_counts, 0 );
 
 		for ( auto it : freq_singletons ) {
-			total_freq_itemsets[it.first] += it.second;
+			all_itemset_counts[it.first] += it.second;
 		}
 
 		pass_level++;
@@ -39,10 +39,10 @@ void apriori::do_apriori( std::string filename, double minsup, double fade_facto
 		
 		while ( !candidate_itemsets.empty() ) {
 			candidate_itemsets = apriori::count_itemsets( batch, candidate_itemsets );
-			auto level_freq_itemsets = apriori::get_frequent_itemsets( total_freq_itemsets, candidate_itemsets, minsup );
+			auto level_freq_itemsets = apriori::get_frequent_itemsets( all_itemset_counts, candidate_itemsets, 0 );
 
 			for ( auto it : level_freq_itemsets ) {
-				total_freq_itemsets[it.first] += it.second;
+				all_itemset_counts[it.first] += it.second;
 			}
 
 			pass_level++;
@@ -51,9 +51,10 @@ void apriori::do_apriori( std::string filename, double minsup, double fade_facto
 			candidate_itemsets = apriori::prune_candidates( level_freq_itemsets, candidate_itemsets );
 		}
 		
-		total_freq_itemsets = apriori::clean_frequent_itemsets( total_freq_itemsets, minsup );
+		auto batch_freq_itemsets = apriori::clean_frequent_itemsets(all_itemset_counts, minsup);
+		
 		std::cout << "Frequent itemsets after adding transactions " << ( batch_no * batch_size ) + 1 << " to " << ( batch_no * batch_size ) + batch.size() << std::endl;
-		apriori::print_frequent_itemsets(total_freq_itemsets);
+		apriori::print_frequent_itemsets(batch_freq_itemsets);
 		std::cout << std::endl;
 
 		batch_no++;

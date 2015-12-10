@@ -6,9 +6,9 @@
 using namespace vert;
 
 transact_set::transact_set() {}
-transact_set::transact_set( const std::vector< int > &transacts ) : m_transacts( transacts ) {}
+transact_set::transact_set( const std::vector< int32_t > &transacts ) : m_transacts( transacts ) {}
 
-void transact_set::append( int transact ) {
+void transact_set::append( int32_t transact ) {
 	m_transacts.push_back( transact );
 }
 
@@ -17,10 +17,7 @@ double transact_set::sum( const vert::fade_set &fade ) const {
 	std::size_t index = 0;
 
 	for( auto it = m_transacts.begin(); it != m_transacts.end(); ++it, ++index ) {
-		double transact = 0.0;
-		if( *it ) {
-			transact = 1.0;
-		}
+		double transact = 1.0;
 
 		if( index < fade.size() ) {
 			transact *= fade[index];
@@ -40,14 +37,18 @@ std::size_t transact_set::size() const {
 	return m_transacts.size();
 }
 
-int transact_set::operator[]( std::size_t index ) const {
+bool transact_set::find( int32_t value ) const {
+	return std::find( m_transacts.begin(), m_transacts.end(), value ) != m_transacts.end();
+}
+
+int32_t transact_set::operator[]( std::size_t index ) const {
 	return m_transacts[index];
 }
 
 transact_set vert::operator&( const transact_set &rhs, const transact_set &lhs ) {
 	transact_set result;
 
-	// This is the union operator. so if an int is in both, append
+	// If the tID is in both, append to results
 	for( std::size_t i = 0; i < rhs.size(); ++i ) {
 		for( std::size_t j = 0; j < lhs.size(); ++j ) {
 			if( rhs[j] == lhs[i] ) {

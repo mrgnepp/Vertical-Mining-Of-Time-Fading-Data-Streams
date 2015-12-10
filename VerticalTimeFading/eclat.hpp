@@ -3,6 +3,7 @@
 #include <vector>
 #include <utility>
 #include <map>
+#include <algorithm>
 
 #include "transact_set.hpp"
 
@@ -46,6 +47,6 @@ struct prefix {
 
 item_set operator&( const item_set &lhs, const item_set &rhs );
 
-std::vector< item_set > do_eclat( const std::vector< item_set > &items, const vert::fade_set &fades, double minsup );
+std::vector< item_set > do_eclat( const std::vector< item_set > &items, const vert::fade_set &fades, double minsup, std::size_t numTransactions );
 
 } }
