@@ -36,6 +36,9 @@
     <ClCompile Include="transact_set.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="apriori.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bit_vector.hpp">
@@ -54,6 +57,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="transact_set.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="apriori.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
