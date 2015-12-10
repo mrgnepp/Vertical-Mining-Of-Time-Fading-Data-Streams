@@ -32,8 +32,8 @@ int32_t main( int32_t argc, char *argv[] ) {
 	}
 
 	const double fadeFactor = 0.5;
-	const double minsup = 5.0;
-	const std::size_t chunkSize = 128;
+	const double minsup = 2.0;
+	const std::size_t chunkSize = 2;
 
 	const std::string testFile = std::string( argv[1] );
 
@@ -47,11 +47,11 @@ int32_t main( int32_t argc, char *argv[] ) {
 	elapsedSeconds = end - start;
 	std::cout << "VIPER Runtime: " << elapsedSeconds.count() << " seconds." << std::endl << std::endl;
 
-	start = std::chrono::system_clock::now();
+	/*start = std::chrono::system_clock::now();
 	run_eclat_test( testFile, fadeFactor, minsup, chunkSize );
 	end = std::chrono::system_clock::now();
 	elapsedSeconds = end - start;
-	std::cout << "Eclat Runtime: " << elapsedSeconds.count() << " seconds." << std::endl << std::endl;
+	std::cout << "Eclat Runtime: " << elapsedSeconds.count() << " seconds." << std::endl << std::endl;*/
 
 	start = std::chrono::system_clock::now();
 	run_apriori_test( testFile, fadeFactor, minsup, chunkSize );
@@ -89,13 +89,12 @@ void run_viper_test( const std::string &filename, double fadeFactor, double mins
 	std::cout << "Time Fading VIPER" << std::endl;
 	std::cout << "Time Fade Factor: " << fadeFactor << std::endl;
 	std::cout << "Minsup: " << minsup << std::endl;
-	std::cout << "Transaction Block Size: " << chunkSize << std::endl << std::endl;
+	std::cout << "Batch Size: " << chunkSize << std::endl << std::endl;
+	std::cout << "Adding new transactions..." << std::endl;
 
 	for( std::size_t i = 1; i < numLines; i += chunkSize ) {
 		std::size_t numTaken = 0;
 		std::string dataString;
-
-		std::cout << "Adding new transactions..." << std::endl;
 
 		while( numTaken < chunkSize && std::getline( dataFile, dataString ) && dataString != std::string( "" ) ) {
 			std::size_t transaction = i + numTaken;
@@ -150,20 +149,20 @@ void run_viper_test( const std::string &filename, double fadeFactor, double mins
 
 		fades.append( fadeFactor, numTaken );
 
-		std::cout << "Begin VIPER round..." << std::endl;
-		std::vector< vert::viper::item_set > result = vert::viper::do_viper( itemSets, fades, minsup );
-
-		std::cout << "Frequent itemsets after adding transactions " << i << " to " << i + chunkSize - 1 << ":" << std::endl;
-
-		for( auto it = result.begin(); it != result.end(); ++it ) {
-			std::cout << it->pretty( fades, dataMap ) << std::endl;
-		}
-
-		std::cout << std::endl;
-
 	}
 
 	dataFile.close();
+
+	std::cout << "Begin VIPER..." << std::endl;
+	std::vector< vert::viper::item_set > result = vert::viper::do_viper( itemSets, fades, minsup );
+
+	std::cout << "Frequent itemsets:" << std::endl;
+
+	for( auto it = result.begin(); it != result.end(); ++it ) {
+		std::cout << it->pretty( fades, dataMap ) << std::endl;
+	}
+
+	std::cout << std::endl;
 }
 
 void run_eclat_test( const std::string &filename, double fadeFactor, double minsup, std::size_t chunkSize ) {
