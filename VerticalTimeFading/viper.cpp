@@ -9,7 +9,7 @@
 
 using namespace vert::viper;
 
-item_set::item_set( std::vector< uint32_t > & name, vert::bit_vector & bits ) : m_name( name ), m_bits( bits ) {}
+item_set::item_set( std::vector< uint32_t > name, vert::bit_vector bits ) : m_name( name ), m_bits( bits ) {}
 item_set::item_set() {};
 
 double vert::viper::item_set::support( const fade_vector &fades ) const {
