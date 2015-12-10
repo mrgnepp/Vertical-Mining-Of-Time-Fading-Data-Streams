@@ -40,7 +40,7 @@ int32_t main( int32_t argc, char *argv[] ) {
 	std::chrono::time_point< std::chrono::system_clock > end;
 	std::chrono::duration< double > elapsedSeconds;
 
-	double t = static_cast< double >( std::stoll( argv[2] ) ) / 10;
+	double t = static_cast< double >( std::stoll( argv[2] ) );
 	std::vector< double > minsups = { t * 0.25, t * 0.5, t * 0.75, t * 1.0, t * 1.5, t * 2.0 };
 
 	for( auto it = minsups.begin(); it != minsups.end(); ++it ) {
@@ -92,7 +92,6 @@ void run_viper_test( const std::string &filename, double fadeFactor, double mins
 
 	std::cout << "Time Fading VIPER" << std::endl;
 	std::cout << "Time Fade Factor: " << fadeFactor << std::endl;
-	std::cout << "Minsup: " << minsup << std::endl;
 	std::cout << "Batch Size: " << chunkSize << std::endl << std::endl;
 	std::cout << "Adding new transactions..." << std::endl;
 
