@@ -168,9 +168,103 @@ void run_viper_test( const std::string &filename, double fadeFactor, double mins
 }
 
 void run_eclat_test( const std::string &filename, double fadeFactor, double minsup, std::size_t chunkSize ) {
+	std::ifstream dataFile;
+	dataFile.open( filename );
 
+	std::string dataLengthString;
+	std::getline( dataFile, dataLengthString );
+	const std::size_t numLines = std::stoll( dataLengthString );
+
+	std::vector< vert::eclat::item_set > itemSets;
+	std::map< uint32_t, uint32_t > dataMap;
+	std::map< uint32_t, uint32_t > reverseDataMap;
+	uint32_t nextIndex = 0;
+	vert::fade_set fades;
+
+	std::cout << "Time Fading Eclat" << std::endl;
+	std::cout << "Time Fade Factor: " << fadeFactor << std::endl;
+	std::cout << "Minsup: " << minsup << std::endl;
+	std::cout << "Transaction Block Size: " << chunkSize << std::endl << std::endl;
+
+	for( std::size_t i = 1; i < numLines; i += chunkSize ) {
+		std::size_t numTaken = 0;
+		std::string dataString;
+
+		std::cout << "Adding new transactions..." << std::endl;
+
+		while( numTaken < chunkSize && std::getline( dataFile, dataString ) && dataString != std::string( "" ) ) {
+			std::size_t transaction = i + numTaken;
+			std::string buffer;
+			std::map< uint32_t, uint32_t > transactionData;
+			std::stringstream ss( dataString );
+
+			//Get rid of the transaction number and count
+			ss >> buffer;
+			//Uncomment this if the sample data includes the number of items in a transaction before the transaction.
+			ss >> buffer;
+
+			while( ss >> buffer ) {
+				uint32_t item = std::stoi( buffer );
+				auto found = reverseDataMap.find( item );
+				if( found == reverseDataMap.end() ) {
+					dataMap[nextIndex] = item;
+					reverseDataMap[item] = nextIndex;
+					transactionData[nextIndex] = false;
+					++nextIndex;
+				} else {
+					transactionData[found->second] = false;
+				}
+			}
+
+			for( auto it = itemSets.begin(); it != itemSets.end(); ++it ) {
+				auto ts = transactionData.find( it->m_name[0] );
+				//it->m_transacts.append( ts != transactionData.end() ); //todo
+				//if( bv != transactionData.end() ) {
+				//  bv->second = true;
+				//}
+				if( ts != transactionData.end() ) {
+					it->m_transacts.append( it->m_name[0] );
+				}
+			}
+
+			for( auto it = transactionData.begin(); it != transactionData.end(); ++it ) {
+				if( !it->second ) {
+					std::vector< int > v;
+					v.push_back( transaction );
+					//for( std::size_t j = 0; j < transaction - 1; ++j ) {
+					//  v.push_back( false );
+					//}
+					std::vector< uint32_t > name = { it->first };
+
+					itemSets.push_back( vert::eclat::item_set( name, vert::transact_set( v ) ) );
+				}
+			}
+
+			++numTaken;
+		}
+
+		fades.append( fadeFactor, numTaken );
+
+		std::cout << "Begin VIPER round..." << std::endl;
+		std::vector< vert::eclat::item_set > result = vert::eclat::do_eclat( itemSets, fades, minsup );
+
+		std::cout << "Frequent itemsets after adding transactions " << i << " to " << i + chunkSize - 1 << ":" << std::endl;
+
+		for( auto it = result.begin(); it != result.end(); ++it ) {
+			std::cout << it->pretty( fades, dataMap ) << std::endl;
+		}
+
+		std::cout << std::endl;
+	}
+
+	dataFile.close();
 }
 
 void run_apriori_test( const std::string &filename, double fadeFactor, double minsup, std::size_t chunkSize ) {
+	std::cout << "Time Apriori" << std::endl;
+	std::cout << "Time Fade Factor: " << fadeFactor << std::endl;
+	std::cout << "Minsup: " << minsup << std::endl;
+	std::cout << "Transaction Block Size: " << chunkSize << std::endl << std::endl;
+
 	apriori::do_apriori( filename, minsup, fadeFactor, static_cast< int >( chunkSize ) );
 }
