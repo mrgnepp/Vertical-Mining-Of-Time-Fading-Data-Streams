@@ -255,5 +255,10 @@ void run_eclat_test( const std::string &filename, double fadeFactor, double mins
 }
 
 void run_apriori_test( const std::string &filename, double fadeFactor, double minsup, std::size_t chunkSize ) {
+	std::cout << "Time Apriori" << std::endl;
+	std::cout << "Time Fade Factor: " << fadeFactor << std::endl;
+	std::cout << "Minsup: " << minsup << std::endl;
+	std::cout << "Transaction Block Size: " << chunkSize << std::endl << std::endl;
+
 	apriori::do_apriori( filename, minsup, fadeFactor, static_cast< int >( chunkSize ) );
 }
