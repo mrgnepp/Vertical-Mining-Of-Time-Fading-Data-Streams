@@ -10,7 +10,7 @@ namespace vert {
 
 class transact_set {
 private:
-	std::vector< int > m_transacts;
+	std::vector< int32_t > m_transacts;
 
 public:
 	transact_set();

@@ -45,13 +45,13 @@ int32_t main( int32_t argc, char *argv[] ) {
 	run_viper_test( testFile, fadeFactor, minsup, chunkSize );
 	end = std::chrono::system_clock::now();
 	elapsedSeconds = end - start;
-	std::cout << "VIPER Runtime: " << elapsedSeconds.count() << " seconds." << std::endl;
+	std::cout << "VIPER Runtime: " << elapsedSeconds.count() << " seconds." << std::endl << std::endl;
 
 	start = std::chrono::system_clock::now();
 	run_eclat_test( testFile, fadeFactor, minsup, chunkSize );
 	end = std::chrono::system_clock::now();
 	elapsedSeconds = end - start;
-	std::cout << "Eclat Runtime: " << elapsedSeconds.count() << " seconds." << std::endl;
+	std::cout << "Eclat Runtime: " << elapsedSeconds.count() << " seconds." << std::endl << std::endl;
 
 	start = std::chrono::system_clock::now();
 	run_apriori_test( testFile, fadeFactor, minsup, chunkSize );
@@ -194,7 +194,7 @@ void run_eclat_test( const std::string &filename, double fadeFactor, double mins
 		while( numTaken < chunkSize && std::getline( dataFile, dataString ) && dataString != std::string( "" ) ) {
 			std::size_t transaction = i + numTaken;
 			std::string buffer;
-			std::map< uint32_t, uint32_t > transactionData;
+			std::map< uint32_t, bool > transactionData;
 			std::stringstream ss( dataString );
 
 			//Get rid of the transaction number and count
@@ -216,25 +216,20 @@ void run_eclat_test( const std::string &filename, double fadeFactor, double mins
 			}
 
 			for( auto it = itemSets.begin(); it != itemSets.end(); ++it ) {
-				auto ts = transactionData.find( it->m_name[0] );
-				//it->m_transacts.append( ts != transactionData.end() ); //todo
-				//if( bv != transactionData.end() ) {
-				//  bv->second = true;
-				//}
-				if( ts != transactionData.end() ) {
-					it->m_transacts.append( it->m_name[0] );
+				auto bv = transactionData.find( it->m_name[0] );
+				if( bv != transactionData.end() ) {
+					it->m_transacts.append( transaction - 1 );
+					bv->second = true;
 				}
+				
 			}
 
 			for( auto it = transactionData.begin(); it != transactionData.end(); ++it ) {
 				if( !it->second ) {
-					std::vector< int > v;
-					v.push_back( transaction );
-					//for( std::size_t j = 0; j < transaction - 1; ++j ) {
-					//  v.push_back( false );
-					//}
-					std::vector< uint32_t > name = { it->first };
+					std::vector< int32_t > v;
+					v.push_back( transaction - 1 );
 
+					std::vector< uint32_t > name = { it->first };
 					itemSets.push_back( vert::eclat::item_set( name, vert::transact_set( v ) ) );
 				}
 			}
@@ -244,7 +239,7 @@ void run_eclat_test( const std::string &filename, double fadeFactor, double mins
 
 		fades.append( fadeFactor, numTaken );
 
-		std::cout << "Begin VIPER round..." << std::endl;
+		std::cout << "Begin Eclat round..." << std::endl;
 		std::vector< vert::eclat::item_set > result = vert::eclat::do_eclat( itemSets, fades, minsup );
 
 		std::cout << "Frequent itemsets after adding transactions " << i << " to " << i + chunkSize - 1 << ":" << std::endl;
