@@ -32,7 +32,7 @@ int32_t main( int32_t argc, char *argv[] ) {
 	}
 
 	const double fadeFactor = 0.5;
-	const std::size_t chunkSize = 128;
+	const std::size_t chunkSize = 3;
 
 	const std::string testFile = std::string( argv[1] );
 
@@ -41,15 +41,15 @@ int32_t main( int32_t argc, char *argv[] ) {
 	std::chrono::duration< double > elapsedSeconds;
 
 	double t = static_cast< double >( std::stoll( argv[2] ) );
-	std::vector< double > minsups = { t * 0.005, t * 0.0075, t * 0.01 };
+	std::vector< double > minsups = { t };// * 0.005, t * 0.0075, t * 0.01 };
 
-	/*for( auto it = minsups.begin(); it != minsups.end(); ++it ) {
+	for( auto it = minsups.begin(); it != minsups.end(); ++it ) {
 		start = std::chrono::system_clock::now();
 		run_viper_test( testFile, fadeFactor, *it, chunkSize );
 		end = std::chrono::system_clock::now();
 		elapsedSeconds = end - start;
 		std::cout << "VIPER Runtime: " << elapsedSeconds.count() << " seconds." << std::endl << std::endl;
-	}*/
+	}
 
 	for( auto it = minsups.begin(); it != minsups.end(); ++it ) {
 		start = std::chrono::system_clock::now();
@@ -59,13 +59,13 @@ int32_t main( int32_t argc, char *argv[] ) {
 		std::cout << "Eclat Runtime: " << elapsedSeconds.count() << " seconds." << std::endl << std::endl;
 	}
 
-	/*for( auto it = minsups.begin(); it != minsups.end(); ++it ) {
+	for( auto it = minsups.begin(); it != minsups.end(); ++it ) {
 		start = std::chrono::system_clock::now();
 		run_apriori_test( testFile, fadeFactor, *it, chunkSize );
 		end = std::chrono::system_clock::now();
 		elapsedSeconds = end - start;
 		std::cout << "Apriori Runtime: " << elapsedSeconds.count() << " seconds." << std::endl;
-	}*/
+	}
 
 	std::cout << std::endl << "End of Processing" << std::endl << "Press Enter to Exit" << std::endl;
 	std::cin.get();
@@ -247,20 +247,20 @@ void run_eclat_test( const std::string &filename, double fadeFactor, double mins
 		}
 
 		fades.append( fadeFactor, numTaken );
-
-		std::cout << "Begin Eclat round..." << std::endl;
-		std::vector< vert::eclat::item_set > result = vert::eclat::do_eclat( itemSets, fades, minsup, numTaken + i );
-
-		std::cout << "Frequent itemsets after adding transactions " << i << " to " << i + chunkSize - 1 << ":" << std::endl;
-
-		for( auto it = result.begin(); it != result.end(); ++it ) {
-			std::cout << it->pretty( fades, dataMap ) << std::endl;
-		}
-
-		std::cout << std::endl;
 	}
 
 	dataFile.close();
+
+	std::cout << "Begin Eclat, minsup = " << minsup << "..." << std::endl;
+	std::vector< vert::eclat::item_set > result = vert::eclat::do_eclat( itemSets, fades, minsup, numLines );
+
+	std::cout << "Frequent itemsets:" << std::endl;
+
+	for( auto it = result.begin(); it != result.end(); ++it ) {
+		std::cout << it->pretty( fades, dataMap ) << std::endl;
+	}
+
+	std::cout << std::endl;
 }
 
 void run_apriori_test( const std::string &filename, double fadeFactor, double minsup, std::size_t chunkSize ) {

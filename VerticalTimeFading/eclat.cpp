@@ -139,7 +139,7 @@ std::vector< item_set > vert::eclat::do_eclat( const std::vector< item_set > &it
 
 	//Build up the candidates for going into the 3rd pass
 	for( std::size_t i = 0; i < numItems; ++i ) {
-		for( std::size_t j = 0; j < numItems - i; ++j ) {
+		for( std::size_t j = 0; j < numItems; ++j ) {
 			if( counts[i][j] >= minsup ) {
 				item_set temp = items[i] & items[j];
 				currentItems.push_back( temp );
