@@ -16,12 +16,10 @@ double transact_set::sum( const vert::fade_set &fade ) const {
 	double result = 0.0;
 	std::size_t index = 0;
 
-	for( auto it = m_transacts.begin(); it != m_transacts.end(); ++it, ++index ) {
+	for( auto it = m_transacts.begin(); it != m_transacts.end(); ++it ) {
 		double transact = 1.0;
-
-		if( index < fade.size() ) {
-			transact *= fade[index];
-		}
+		
+		transact *= fade[*it];
 
 		result += transact;
 	}
