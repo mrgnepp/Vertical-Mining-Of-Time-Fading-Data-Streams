@@ -35,7 +35,7 @@ std::size_t transact_set::size() const {
 	return m_transacts.size();
 }
 
-bool transact_set::find( int32_t value ) const {
+bool transact_set::find( size_t value ) const {
 	return std::find( m_transacts.begin(), m_transacts.end(), value ) != m_transacts.end();
 }
 

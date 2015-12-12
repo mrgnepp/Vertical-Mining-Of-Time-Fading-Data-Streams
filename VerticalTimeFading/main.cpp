@@ -27,7 +27,7 @@ void run_apriori_test( const std::string &filename, double fadeFactor, double mi
 
 int32_t main( int32_t argc, char *argv[] ) {
 	if( argc < 3 ) {
-		std::cout << "Please specify a data file." << std::endl;
+		std::cout << "Please specify a data file and # of transactions in that file." << std::endl;
 		return EXIT_SUCCESS;
 	}
 
@@ -41,7 +41,7 @@ int32_t main( int32_t argc, char *argv[] ) {
 	std::chrono::duration< double > elapsedSeconds;
 
 	double t = static_cast< double >( std::stoll( argv[2] ) );
-	std::vector< double > minsups = { t * 0.005, t * 0.0075, t * 0.01 };
+	std::vector< double > minsups = { t * 0.0025, t * 0.005, t * 0.0075, t * 0.01, t * 0.025, t * 0.05, t * 0.075, t * 0.1 };
 
 	for( auto it = minsups.begin(); it != minsups.end(); ++it ) {
 		start = std::chrono::system_clock::now();
@@ -199,7 +199,7 @@ void run_eclat_test( const std::string &filename, double fadeFactor, double mins
 		std::string dataString;
 
 		while( numTaken < chunkSize && std::getline( dataFile, dataString ) && dataString != std::string( "" ) ) {
-			std::size_t transaction = i + numTaken;
+			std::int32_t transaction = (uint32_t)(i + numTaken);
 			std::string buffer;
 			std::map< uint32_t, bool > transactionData;
 			std::stringstream ss( dataString );
