@@ -32,7 +32,7 @@ int32_t main( int32_t argc, char *argv[] ) {
 	}
 
 	const double fadeFactor = 0.5;
-	const std::size_t chunkSize = 3;
+	const std::size_t chunkSize = 128;
 
 	const std::string testFile = std::string( argv[1] );
 
@@ -41,7 +41,7 @@ int32_t main( int32_t argc, char *argv[] ) {
 	std::chrono::duration< double > elapsedSeconds;
 
 	double t = static_cast< double >( std::stoll( argv[2] ) );
-	std::vector< double > minsups = { t };// * 0.005, t * 0.0075, t * 0.01 };
+	std::vector< double > minsups = { t * 0.005, t * 0.0075, t * 0.01 };
 
 	for( auto it = minsups.begin(); it != minsups.end(); ++it ) {
 		start = std::chrono::system_clock::now();
@@ -189,16 +189,15 @@ void run_eclat_test( const std::string &filename, double fadeFactor, double mins
 	uint32_t nextIndex = 0;
 	vert::fade_set fades;
 
-	std::cout << "Time Fading Eclat" << std::endl;
+	std::cout << "Time Fade Eclat" << std::endl;
 	std::cout << "Time Fade Factor: " << fadeFactor << std::endl;
 	std::cout << "Minsup: " << minsup << std::endl;
-	std::cout << "Transaction Block Size: " << chunkSize << std::endl << std::endl;
+	std::cout << "Batch Size: " << chunkSize << std::endl << std::endl;
+	std::cout << "Adding new transactions..." << std::endl;
 
 	for( std::size_t i = 1; i < numLines; i += chunkSize ) {
 		std::size_t numTaken = 0;
 		std::string dataString;
-
-		std::cout << "Adding new transactions..." << std::endl;
 
 		while( numTaken < chunkSize && std::getline( dataFile, dataString ) && dataString != std::string( "" ) ) {
 			std::size_t transaction = i + numTaken;
