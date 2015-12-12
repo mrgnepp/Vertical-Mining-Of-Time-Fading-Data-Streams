@@ -41,7 +41,7 @@ int32_t main( int32_t argc, char *argv[] ) {
 	std::chrono::duration< double > elapsedSeconds;
 
 	double t = static_cast< double >( std::stoll( argv[2] ) );
-	std::vector< double > minsups = { t * 0.0025, t * 0.005, t * 0.0075, t * 0.01, t * 0.025, t * 0.05, t * 0.075, t * 0.1 };
+	std::vector< double > minsups = { t * 0.001, t * 0.0015, t * 0.002, t * 0.0025 };
 
 	for( auto it = minsups.begin(); it != minsups.end(); ++it ) {
 		start = std::chrono::system_clock::now();
