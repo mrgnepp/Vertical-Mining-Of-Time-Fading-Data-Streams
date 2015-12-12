@@ -51,7 +51,7 @@ transact_set vert::operator&( const transact_set &rhs, const transact_set &lhs )
 	// If the tID is in both, append to results
 	for( std::size_t i = 0; i < rhs.size(); ++i ) {
 		for( std::size_t j = 0; j < lhs.size(); ++j ) {
-			if( rhs[j] == lhs[i] ) {
+			if( rhs[i] == lhs[j] ) {
 				result.append( rhs[i] );
 			}
 		}

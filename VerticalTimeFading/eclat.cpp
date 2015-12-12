@@ -39,7 +39,7 @@ item_set vert::eclat::operator&( const item_set &lhs, const item_set &rhs ) {
 	std::sort( unordered.begin(), unordered.end() );
 
 	std::vector< uint32_t > newName;
-	uint32_t last = std::numeric_limits<uint32_t>::max();
+	uint32_t last = std::numeric_limits< uint32_t >::max();
 
 	for( auto it = unordered.begin(); it != unordered.end(); ++it ) {
 		if( *it != last ) {
@@ -137,7 +137,6 @@ std::vector< item_set > vert::eclat::do_eclat( const std::vector< item_set > &it
 		}
 	}
 
-	/* ECLAT GOES OUT OF BOUNDS 
 	//Build up the candidates for going into the 3rd pass
 	for( std::size_t i = 0; i < numItems; ++i ) {
 		for( std::size_t j = 0; j < numItems - i; ++j ) {
@@ -147,7 +146,7 @@ std::vector< item_set > vert::eclat::do_eclat( const std::vector< item_set > &it
 				results.push_back( temp );
 			}
 		}
-	} */
+	}
 	
 	//Subsequent passes
 	std::size_t currentLevel = 2;
