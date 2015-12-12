@@ -4,7 +4,8 @@ Morgan Epp, Tayler Frederick, and Evan Spearman
 Applying vertical mining techniques to the time fading model of data stream mining. Implementation of VIPER and ECLAT algorithms and comparing their effectiveness against each other.
 
 
-To build implementation, use Microsoft Visual Studio 2015.
+To build the implementation, use Microsoft Visual Studio 2015 and build using the "Release" configuration
+
 How-To Run:
 
 To run on Visual Studio 2015, add the following commandline arguments for the project's release mode:
