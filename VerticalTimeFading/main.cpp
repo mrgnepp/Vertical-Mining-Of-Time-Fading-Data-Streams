@@ -191,7 +191,6 @@ void run_eclat_test( const std::string &filename, double fadeFactor, double mins
 
 	std::cout << "Time Fade Eclat" << std::endl;
 	std::cout << "Time Fade Factor: " << fadeFactor << std::endl;
-	std::cout << "Minsup: " << minsup << std::endl;
 	std::cout << "Batch Size: " << chunkSize << std::endl << std::endl;
 	std::cout << "Adding new transactions..." << std::endl;
 
